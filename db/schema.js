@@ -50,6 +50,7 @@ const typeDefs = `#graphql
         authUser(input: AuthInput!) : Token
 
         newProduct(input: ProductInput) : Product
+        updateProduct(id: ID!, input: ProductInput) : Product
     }
 `;
 
