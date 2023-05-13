@@ -6,13 +6,17 @@ const createToken = (user, secret, expiresIn) => {
   console.log(user);
   const { id, email, name, last_name } = user;
 
-  return jwt.sign({ id }, secret, { expiresIn });
+  return jwt.sign({ id, email, name, last_name }, secret, { expiresIn });
 };
 
 // Resolvers
 const resolvers = {
   Query: {
-    getCourse: () => 'Curso'
+    getUser: async (_, { token }, ctx) => {
+      const userId = await jwt.verify(token, process.env.SECRET)
+
+      return userId
+    }
   },
   Mutation: {
     newUser: async (_, { input }, ctx) => {
