@@ -1,12 +1,14 @@
 import { mongoose } from 'mongoose'
 
-const UserSchema = mongoose.UserSchema({
+const { Schema } = mongoose
+
+const UserSchema = new Schema({
   name: {
     type: String,
     required: true,
     trim: true,
   },
-  lastName: {
+  last_name: {
     type: String,
     required: true,
     trim: true,
@@ -22,10 +24,11 @@ const UserSchema = mongoose.UserSchema({
     required: true,
     trim: true,
   },
-  created: {
+  created_at: {
     type: Date,
     default: Date.now()
   },
 });
 
-export default mongoose.model('User', UserSchema)
+const User = mongoose.model("User", UserSchema);
+export default User
