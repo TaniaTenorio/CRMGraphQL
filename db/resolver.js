@@ -1,4 +1,5 @@
 import User from '../models/User.js'
+import Product from '../models/Product.js';
 import bcryptjs from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
@@ -16,6 +17,15 @@ const resolvers = {
       const userId = await jwt.verify(token, process.env.SECRET)
 
       return userId
+    },
+    getProducts: async () => {
+      try {
+        const products = await Product.find({})
+
+        return products;
+      } catch(error) {
+        console.error(error)
+      }
     }
   },
   Mutation: {
@@ -58,6 +68,18 @@ const resolvers = {
       // Create token
       return {
         token: createToken(userRegistered, process.env.SECRET, '24h')
+      }
+    },
+    newProduct: async (_, { input }, ctx) => {
+      try {
+        const product = new Product(input)
+
+        // Save in DB
+        const res = await product.save()
+
+        return res
+      } catch(error){
+        console.error(error )
       }
     }
   }
