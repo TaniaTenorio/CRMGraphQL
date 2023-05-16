@@ -20,6 +20,16 @@ const typeDefs = `#graphql
         created_at: String
     }
 
+    type Client {
+        id: ID
+        name: String
+        last_name: String
+        company: String
+        email: String
+        phone: String
+        seller: ID
+    }
+
     input UserInput {
         name: String!
         last_name: String!
@@ -38,6 +48,14 @@ const typeDefs = `#graphql
         price: Float!
     }
 
+    input ClientInput {
+        name: String!
+        last_name: String!
+        company: String!
+        email: String!
+        phone: String
+    }
+
     type Query {
         getUser(token: String!) : User
 
@@ -52,6 +70,8 @@ const typeDefs = `#graphql
         newProduct(input: ProductInput) : Product
         updateProduct(id: ID!, input: ProductInput) : Product
         deleteProduct(id: ID!) : String
+
+        newClient(input: ClientInput) : Client
     }
 `;
 
