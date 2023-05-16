@@ -1,5 +1,6 @@
 import User from '../models/User.js'
 import Product from '../models/Product.js';
+import Client from '../models/Client.js';
 import bcryptjs from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
@@ -117,6 +118,26 @@ const resolvers = {
       await Product.findOneAndDelete({_id: id})
 
       return 'Product deleted seuccessfully'
+    },
+    newClient: async (_, { input }, ctx) => {
+      const { email } = input
+      console.log(ctx);
+      // Check if client is registered
+      const client = await Client.findOne({ email })
+      if (client) {
+        throw new Error('Client already exists')
+      }
+
+      const newClient = new Client(input);
+      // Assingn seller
+      newClient.seller = ctx.user.id;
+      // Save in DB
+      try {
+        const result = await newClient.save();
+        return result;
+      } catch (error) {
+        console.error(error)
+      }
     }
   }
 }
