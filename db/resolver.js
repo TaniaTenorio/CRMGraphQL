@@ -1,6 +1,7 @@
 import User from '../models/User.js'
 import Product from '../models/Product.js';
 import Client from '../models/Client.js';
+import Order from '../models/Order.js';
 import bcryptjs from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
@@ -208,6 +209,47 @@ const resolvers = {
       // Delete client 
       await Client.findOneAndDelete({_id: id})
       return 'Client successfully deleted'
+    },
+    newOrder: async (_, {input}, ctx) => {
+      // Check if client exists
+      const { client, order } = input
+
+      let validClient = await Client.findById(client)
+
+      if(!validClient){
+        throw new Error('Client does not exist')
+      }
+
+      // Check if seller is linked to client
+      if(validClient.seller.toString() !== ctx.user.id) {
+        throw new Error('You cannot create orders for this client')
+      }
+
+      // Check available stock
+      for await (const element of order) {
+        const { id } = element
+
+        const product = await Product.findById(id)
+
+        if(element.amount > product.stock) {
+          throw new Error(`The amount requested of ${product.name} exceeds the stock available`)
+        } else {
+          // Update stock
+          product.stock = product.stock - element.amount
+
+          await product.save( )
+        }
+      }
+
+      // Create new order
+      const newOrder = new Order(input)
+
+      // Assing seller to order
+      newOrder.seller = ctx.user.id
+
+      // Save order in DB
+      const result = await newOrder.save()
+      return result
     }
   },
 };

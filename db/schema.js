@@ -30,6 +30,21 @@ const typeDefs = `#graphql
         seller: ID
     }
 
+    type OrderProduct {
+        id: ID
+        amount: Int
+    }
+
+    type Order {
+        id: ID
+        order: [OrderProduct]
+        total: Float
+        client: ID
+        seller: ID
+        date: String
+        status: OrderStatus
+    }
+
     input UserInput {
         name: String!
         last_name: String!
@@ -56,6 +71,24 @@ const typeDefs = `#graphql
         phone: String
     }
 
+    input OrderProductInput {
+        id: ID
+        amount: Int
+    }
+
+    input OrderInput {
+        order: [OrderProductInput]
+        total: Float!
+        client: ID!
+        status: OrderStatus
+    }
+
+    enum OrderStatus {
+        PENDING
+        COMPLETED
+        CANCELLED
+    }
+
     type Query {
         getUser(token: String!) : User
 
@@ -78,6 +111,8 @@ const typeDefs = `#graphql
         newClient(input: ClientInput) : Client
         updateClient(id: ID!, input: ClientInput) : Client
         deleteClient(id: ID!) : String
+
+        newOrder(input: OrderInput): Order
     }
 `;
 
