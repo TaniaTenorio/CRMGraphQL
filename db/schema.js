@@ -61,6 +61,10 @@ const typeDefs = `#graphql
 
         getProducts : [Product]
         getOneProduct(id: ID!) : Product
+
+        getClients : [Client]
+        getClientsSeller : [Client]
+        getClient(id: ID!): Client
     }
 
     type Mutation {
@@ -72,6 +76,8 @@ const typeDefs = `#graphql
         deleteProduct(id: ID!) : String
 
         newClient(input: ClientInput) : Client
+        updateClient(id: ID!, input: ClientInput) : Client
+        deleteClient(id: ID!) : String
     }
 `;
 
