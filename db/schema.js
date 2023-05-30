@@ -78,8 +78,8 @@ const typeDefs = `#graphql
 
     input OrderInput {
         order: [OrderProductInput]
-        total: Float!
-        client: ID!
+        total: Float
+        client: ID
         status: OrderStatus
     }
 
@@ -98,6 +98,10 @@ const typeDefs = `#graphql
         getClients : [Client]
         getClientsSeller : [Client]
         getClient(id: ID!): Client
+
+        getOrders: [Order]
+        getOrderSeller: [Order]
+        getOrder(id: ID!) : Order
     }
 
     type Mutation {
@@ -113,6 +117,8 @@ const typeDefs = `#graphql
         deleteClient(id: ID!) : String
 
         newOrder(input: OrderInput): Order
+        updateOrder(id: ID!, input: OrderInput): Order
+        deleteOrder(id: ID!): String
     }
 `;
 

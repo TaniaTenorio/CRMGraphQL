@@ -49,27 +49,57 @@ const resolvers = {
     },
     getClientsSeller: async (_, {}, ctx) => {
       try {
-        const clients = await Client.find({ seller: ctx.user.id.toString()})
-        return clients
-      } catch (error) {
-        
-      }
+        const clients = await Client.find({ seller: ctx.user.id.toString() });
+        return clients;
+      } catch (error) {}
     },
-    getClient: async (_, {id}, ctx) => {
+    getClient: async (_, { id }, ctx) => {
       // Check if client exists
-      const client = await Client.findById(id)
+      const client = await Client.findById(id);
 
-      if(!client) {
-        throw new Error('Client does not exist')
+      if (!client) {
+        throw new Error("Client does not exist");
       }
 
       // Only the linked seller can see the client
-      if(client.seller.toString() !== ctx.user.id) {
-        throw new Error ('You are not allowed to acces this information')
+      if (client.seller.toString() !== ctx.user.id) {
+        throw new Error("You are not allowed to acces this information");
       }
 
-      return client
-    }
+      return client;
+    },
+    getOrders: async () => {
+      try {
+        const orders = await Order.find({});
+        return orders;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    getOrderSeller: async (_, {}, ctx) => {
+      try {
+        const orders = await Order.find({ seller: ctx.user.id });
+        return orders;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    getOrder: async (_, { id }, ctx) => {
+      // Check if order exists
+      const validOrder = await Order.findById(id);
+      console.log(validOrder);
+      if (!validOrder) {
+        throw new Error("Order id does not exist");
+      }
+
+      // Only assigned seller can fetch data
+      if (validOrder.seller.toString() !== ctx.user.id) {
+        throw new Error("You are not allowed to access this information");
+      }
+
+      // Return data
+      return validOrder;
+    },
   },
   Mutation: {
     newUser: async (_, { input }, ctx) => {
@@ -176,7 +206,7 @@ const resolvers = {
         console.error(error);
       }
     },
-    updateClient: async (_, {id, input}, ctx) => {
+    updateClient: async (_, { id, input }, ctx) => {
       // Check if client exists
       let client = await Client.findById(id);
 
@@ -190,67 +220,136 @@ const resolvers = {
       }
 
       // Save data
-      client = await Client.findOneAndUpdate({_id: id}, input, {new: true})
-      return client
+      client = await Client.findOneAndUpdate({ _id: id }, input, { new: true });
+      return client;
     },
-    deleteClient: async (_, {id}, ctx) => {
+    deleteClient: async (_, { id }, ctx) => {
       // CHeck if client exists
-      let client = await Client.findById(id)
+      let client = await Client.findById(id);
 
-      if(!client) {
-        throw new Error('Client does not exist')
+      if (!client) {
+        throw new Error("Client does not exist");
       }
 
       // Check if seller has acces to client info
-      if(client.seller.toString() !== ctx.user.id){
-        throw new Error('You do not have access to edit this information')
+      if (client.seller.toString() !== ctx.user.id) {
+        throw new Error("You do not have access to edit this information");
       }
 
-      // Delete client 
-      await Client.findOneAndDelete({_id: id})
-      return 'Client successfully deleted'
+      // Delete client
+      await Client.findOneAndDelete({ _id: id });
+      return "Client successfully deleted";
     },
-    newOrder: async (_, {input}, ctx) => {
+    newOrder: async (_, { input }, ctx) => {
       // Check if client exists
-      const { client, order } = input
+      const { client, order } = input;
 
-      let validClient = await Client.findById(client)
+      let validClient = await Client.findById(client);
 
-      if(!validClient){
-        throw new Error('Client does not exist')
+      if (!validClient) {
+        throw new Error("Client does not exist");
       }
 
       // Check if seller is linked to client
-      if(validClient.seller.toString() !== ctx.user.id) {
-        throw new Error('You cannot create orders for this client')
+      if (validClient.seller.toString() !== ctx.user.id) {
+        throw new Error("You cannot create orders for this client");
       }
 
       // Check available stock
       for await (const element of order) {
-        const { id } = element
+        const { id } = element;
 
-        const product = await Product.findById(id)
+        const product = await Product.findById(id);
 
-        if(element.amount > product.stock) {
-          throw new Error(`The amount requested of ${product.name} exceeds the stock available`)
+        if (element.amount > product.stock) {
+          throw new Error(
+            `The amount requested of ${product.name} exceeds the stock available`
+          );
         } else {
           // Update stock
-          product.stock = product.stock - element.amount
+          product.stock = product.stock - element.amount;
 
-          await product.save( )
+          await product.save();
         }
       }
 
       // Create new order
-      const newOrder = new Order(input)
+      const newOrder = new Order(input);
 
       // Assing seller to order
-      newOrder.seller = ctx.user.id
+      newOrder.seller = ctx.user.id;
 
       // Save order in DB
-      const result = await newOrder.save()
-      return result
-    }
+      const result = await newOrder.save();
+      return result;
+    },
+    updateOrder: async (_, { id, input }, ctx) => {
+      const { client } = input;
+
+      // Check if order exixts
+      const validOrder = await Order.findById(id);
+
+      if (!validOrder) {
+        throw new Error("Order id does not exist");
+      }
+
+      // Check if client exists
+      const validClient = await Client.findById(client);
+      if (!validClient) {
+        throw new Error("Client id does not exist");
+      }
+
+      // Check if client and order is linked to seller
+      if (validClient.seller.toString() !== ctx.user.id) {
+        throw new Error("You are not allowed to access this information");
+      }
+
+      if (validOrder.seller.toString() !== ctx.user.id) {
+        throw new Error("You are not allowed to access this information");
+      }
+
+      // Check stock
+      if (input.order) {
+        for await (const element of input.order) {
+          const { id } = element;
+
+          const product = await Product.findById(id);
+
+          if (element.amount > product.stock) {
+            throw new Error(
+              `The amount requested of ${product.name} exceeds the stock available`
+            );
+          } else {
+            // Update stock
+            product.stock = product.stock - element.amount;
+
+            await product.save();
+          }
+        }
+      }
+
+      // Save changes
+      const result = await Order.findOneAndUpdate({ _id: id }, input, {
+        new: true,
+      });
+      return result;
+    },
+    deleteOrder: async (_, { id }, ctx) => {
+      // Check if order exists
+      const validOrder = await Order.findById(id);
+      if (!validOrder) {
+        throw new Error("Order id does not exists");
+      }
+
+      // Check if order is linked to seller
+      if (validOrder.seller.toString() !== ctx.user.id) {
+        throw new Error("You are not allowed to access this information");
+      }
+
+      // Delete order
+      await Order.findOneAndDelete({ _id: id });
+      return "Order deleted successfully";
+    },
   },
 };
 
