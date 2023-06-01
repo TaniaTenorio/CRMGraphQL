@@ -102,6 +102,7 @@ const typeDefs = `#graphql
         getOrders: [Order]
         getOrderSeller: [Order]
         getOrder(id: ID!) : Order
+        getOrdersByStatus(status: String!) : [Order]
     }
 
     type Mutation {

@@ -87,7 +87,6 @@ const resolvers = {
     getOrder: async (_, { id }, ctx) => {
       // Check if order exists
       const validOrder = await Order.findById(id);
-      console.log(validOrder);
       if (!validOrder) {
         throw new Error("Order id does not exist");
       }
@@ -100,6 +99,13 @@ const resolvers = {
       // Return data
       return validOrder;
     },
+    getOrdersByStatus: async (_, { status }, ctx) => {
+      // Bring order only from authenticated seller and with status selected
+      const orders = await Order.find({ seller: ctx.user.id, status })
+
+      return orders
+
+    }
   },
   Mutation: {
     newUser: async (_, { input }, ctx) => {
