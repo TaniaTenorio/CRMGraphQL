@@ -45,6 +45,16 @@ const typeDefs = `#graphql
         status: OrderStatus
     }
 
+    type TopClient {
+        total: Float
+        client: [Client]
+    }
+
+    type TopSeller {
+        total: Float
+        seller: [User]
+    }
+
     input UserInput {
         name: String!
         last_name: String!
@@ -103,6 +113,10 @@ const typeDefs = `#graphql
         getOrderSeller: [Order]
         getOrder(id: ID!) : Order
         getOrdersByStatus(status: String!) : [Order]
+
+        bestClients: [TopClient]
+        bestSellers: [TopSeller]
+        searchProduct(text: String!): [Product]
     }
 
     type Mutation {

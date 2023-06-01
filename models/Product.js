@@ -24,6 +24,8 @@ const ProductSchema = new Schema({
     }
 })
 
+ProductSchema.index({ name: 'text'})
+
 
 const Product = mongoose.model("Product", ProductSchema);
 export default Product;
