@@ -15,10 +15,9 @@ const createToken = (user, secret, expiresIn) => {
 // Resolvers
 const resolvers = {
   Query: {
-    getUser: async (_, { token }, ctx) => {
-      const userId = await jwt.verify(token, process.env.SECRET);
-
-      return userId;
+    getUser: async (_, {}, ctx) => {
+      console.log('CTX', ctx);
+      return ctx.user
     },
     getProducts: async () => {
       try {
@@ -78,7 +77,9 @@ const resolvers = {
     },
     getOrderSeller: async (_, {}, ctx) => {
       try {
-        const orders = await Order.find({ seller: ctx.user.id });
+        const orders = await Order.find({ seller: ctx.user.id }).populate('client');
+
+        console.log('orders', orders);
         return orders;
       } catch (error) {
         console.error(error);

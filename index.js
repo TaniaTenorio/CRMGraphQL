@@ -20,9 +20,13 @@ const { url } = await startStandaloneServer(server, {
   context: async({req}) => {
     // console.log(req.headers['authorization']);
     const token = req.headers["authorization"] || '';
+    // console.log("token", token);
     if(token) {
+      const TOKEN = token.replace('Bearer ', "")
+      // console.log('TOKEN', TOKEN);
       try {
-        const user = jwt.verify(token, process.env.SECRET)
+        const user = jwt.verify(TOKEN, process.env.SECRET);
+        // console.log('USER', user)
         return {
           user
         }

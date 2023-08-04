@@ -33,13 +33,15 @@ const typeDefs = `#graphql
     type OrderProduct {
         id: ID
         amount: Int
+        name: String
+        price: Float
     }
 
     type Order {
         id: ID
         order: [OrderProduct]
         total: Float
-        client: ID
+        client: Client
         seller: ID
         date: String
         status: OrderStatus
@@ -84,6 +86,8 @@ const typeDefs = `#graphql
     input OrderProductInput {
         id: ID
         amount: Int
+        name: String
+        price: Float
     }
 
     input OrderInput {
@@ -100,7 +104,7 @@ const typeDefs = `#graphql
     }
 
     type Query {
-        getUser(token: String!) : User
+        getUser : User
 
         getProducts : [Product]
         getOneProduct(id: ID!) : Product
