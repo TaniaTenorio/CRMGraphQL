@@ -153,7 +153,6 @@ const resolvers = {
           $sort: { total: -1 }
         }
       ])
-
       return sellers
     },
     searchProduct: async (_, { text }) => {
