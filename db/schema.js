@@ -109,7 +109,7 @@ const typeDefs = `#graphql
         getProducts : [Product]
         getOneProduct(id: ID!) : Product
 
-        getClients : [Client]
+        getClients(limit: Int) : [Client]
         getClientsSeller : [Client]
         getClient(id: ID!): Client
 

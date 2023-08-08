@@ -38,9 +38,9 @@ const resolvers = {
 
       return product;
     },
-    getClients: async () => {
+    getClients: async (_, { limit }) => {
       try {
-        const clients = await Client.find({});
+        const clients = await Client.find({}).limit(limit);
         return clients;
       } catch (error) {
         console.error(error);
