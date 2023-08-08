@@ -1,9 +1,9 @@
-import User from '../models/User.js'
-import Product from '../models/Product.js';
-import Client from '../models/Client.js';
-import Order from '../models/Order.js';
-import bcryptjs from 'bcryptjs'
-import jwt from 'jsonwebtoken'
+import User from "../models/User.js";
+import Product from "../models/Product.js";
+import Client from "../models/Client.js";
+import Order from "../models/Order.js";
+import bcryptjs from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 const createToken = (user, secret, expiresIn) => {
   console.log(user);
@@ -16,8 +16,8 @@ const createToken = (user, secret, expiresIn) => {
 const resolvers = {
   Query: {
     getUser: async (_, {}, ctx) => {
-      console.log('CTX', ctx);
-      return ctx.user
+      console.log("CTX", ctx);
+      return ctx.user;
     },
     getProducts: async () => {
       try {
@@ -46,9 +46,11 @@ const resolvers = {
         console.error(error);
       }
     },
-    getClientsSeller: async (_, {}, ctx) => {
+    getClientsSeller: async (_, { limit, offset }, ctx) => {
       try {
-        const clients = await Client.find({ seller: ctx.user.id.toString() });
+        const clients = await Client.find({ seller: ctx.user.id.toString() })
+          .limit(limit)
+          .skip(offset);
         return clients;
       } catch (error) {}
     },
@@ -67,6 +69,18 @@ const resolvers = {
 
       return client;
     },
+    getTotalClients: async (_, {}, ctx) => {
+      try {
+        const total = await Client.countDocuments({
+          seller: ctx.user.id.toString(),
+        });
+        console.log("TOTAL", total);
+        return total;
+      } catch (error) {
+        console.error(error);
+        throw new Error(error);
+      }
+    },
     getOrders: async () => {
       try {
         const orders = await Order.find({});
@@ -77,9 +91,11 @@ const resolvers = {
     },
     getOrderSeller: async (_, {}, ctx) => {
       try {
-        const orders = await Order.find({ seller: ctx.user.id }).populate('client');
+        const orders = await Order.find({ seller: ctx.user.id }).populate(
+          "client"
+        );
 
-        console.log('orders', orders);
+        console.log("orders", orders);
         return orders;
       } catch (error) {
         console.error(error);
@@ -102,10 +118,9 @@ const resolvers = {
     },
     getOrdersByStatus: async (_, { status }, ctx) => {
       // Bring order only from authenticated seller and with status selected
-      const orders = await Order.find({ seller: ctx.user.id, status })
+      const orders = await Order.find({ seller: ctx.user.id, status });
 
-      return orders
-
+      return orders;
     },
     bestClients: async () => {
       const clients = await Order.aggregate([
@@ -119,48 +134,50 @@ const resolvers = {
         {
           $lookup: {
             from: "clients",
-            localField: '_id',
+            localField: "_id",
             foreignField: "_id",
             as: "client",
           },
         },
         {
-          $sort : { total: -1 }
-        }
+          $sort: { total: -1 },
+        },
       ]);
 
-      return clients
+      return clients;
     },
     bestSellers: async () => {
       const sellers = await Order.aggregate([
-        { $match: { status: "COMPLETED"} },
+        { $match: { status: "COMPLETED" } },
         {
           $group: {
             _id: "$seller",
-            total: { $sum: "$total"}
-          }
-        },
-        { $lookup: {
-          from: "users",
-          localField: "_id",
-          foreignField: "_id",
-          as: "seller",
-        }},
-        {
-          $limit: 3
+            total: { $sum: "$total" },
+          },
         },
         {
-          $sort: { total: -1 }
-        }
-      ])
-      return sellers
+          $lookup: {
+            from: "users",
+            localField: "_id",
+            foreignField: "_id",
+            as: "seller",
+          },
+        },
+        {
+          $limit: 3,
+        },
+        {
+          $sort: { total: -1 },
+        },
+      ]);
+      return sellers;
     },
     searchProduct: async (_, { text }) => {
-      const products = await Product.find({ $text: { $search: text }})
+      const products = await Product.find({ $text: { $search: text } });
       // Nice to have: add pagination
 
-      return products
-    }
+      return products;
+    },
   },
   Mutation: {
     newUser: async (_, { input }, ctx) => {
@@ -414,4 +431,4 @@ const resolvers = {
   },
 };
 
-export default resolvers
+export default resolvers;

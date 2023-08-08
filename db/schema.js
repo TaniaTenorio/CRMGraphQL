@@ -110,8 +110,9 @@ const typeDefs = `#graphql
         getOneProduct(id: ID!) : Product
 
         getClients(limit: Int) : [Client]
-        getClientsSeller : [Client]
+        getClientsSeller(limit: Int, offset: Int) : [Client]
         getClient(id: ID!): Client
+        getTotalClients : String
 
         getOrders: [Order]
         getOrderSeller: [Order]
