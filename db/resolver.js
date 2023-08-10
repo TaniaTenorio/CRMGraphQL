@@ -7,9 +7,9 @@ import jwt from "jsonwebtoken";
 
 const createToken = (user, secret, expiresIn) => {
   console.log(user);
-  const { id, email, name, last_name } = user;
+  const { id, email, name, last_name, rol } = user;
 
-  return jwt.sign({ id, email, name, last_name }, secret, { expiresIn });
+  return jwt.sign({ id, email, name, last_name, rol }, secret, { expiresIn });
 };
 
 // Resolvers

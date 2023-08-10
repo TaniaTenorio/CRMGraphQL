@@ -6,6 +6,7 @@ const typeDefs = `#graphql
         last_name: String
         email: String
         created_at: String
+        rol: String
     }
 
     type Token {
@@ -28,6 +29,7 @@ const typeDefs = `#graphql
         email: String
         phone: String
         seller: ID
+        created_at: String
     }
 
     type OrderProduct {
@@ -62,6 +64,7 @@ const typeDefs = `#graphql
         last_name: String!
         email: String!
         password: String!
+        rol: String!
     }
 
     input AuthInput {
