@@ -74,7 +74,6 @@ const resolvers = {
         const total = await Client.countDocuments({
           seller: ctx.user.id.toString(),
         });
-        console.log("TOTAL", total);
         return total;
       } catch (error) {
         console.error(error);
