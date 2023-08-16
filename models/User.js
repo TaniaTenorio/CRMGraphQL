@@ -26,13 +26,13 @@ const UserSchema = new Schema({
   },
   created_at: {
     type: Date,
-    default: Date.now()
+    default: Date.now(),
   },
   rol: {
     type: String,
     required: true,
-  }
-});
+  },
+})
 
-const User = mongoose.model("User", UserSchema);
+const User = mongoose.model('User', UserSchema)
 export default User

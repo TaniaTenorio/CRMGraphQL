@@ -63,7 +63,7 @@ const typeDefs = `#graphql
         name: String!
         last_name: String!
         email: String!
-        password: String!
+        password: String
         rol: String!
     }
 
@@ -108,6 +108,8 @@ const typeDefs = `#graphql
 
     type Query {
         getUser : User
+        getOneUser(id: ID!): User
+        getUsers: [User]
 
         getProducts : [Product]
         getOneProduct(id: ID!) : Product
@@ -130,6 +132,8 @@ const typeDefs = `#graphql
     type Mutation {
         newUser(input: UserInput!) : User
         authUser(input: AuthInput!) : Token
+        updateUser(id:ID!, input: UserInput!): User
+        deleteUser(id: ID!): String
 
         newProduct(input: ProductInput) : Product
         updateProduct(id: ID!, input: ProductInput) : Product
@@ -143,6 +147,6 @@ const typeDefs = `#graphql
         updateOrder(id: ID!, input: OrderInput): Order
         deleteOrder(id: ID!): String
     }
-`;
+`
 
 export default typeDefs
